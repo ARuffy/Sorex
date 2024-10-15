@@ -5,10 +5,10 @@ set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/CMake/")
 # ###############################
 # Project
 # ###############################
-set(PROJECT_NAME "Lorex")
+set(PROJECT_NAME "Sorex")
 project(${PROJECT_NAME}
      VERSION 0.1.0
-     DESCRIPTION "Lightweight OpenGL Rendering Engine eXtended"
+     DESCRIPTION "Simple OpenGL Rendering Engine eXtended"
      # [HOMEPAGE_URL <url-string>]
      LANGUAGES C CXX
 )
@@ -18,14 +18,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "Configuration types" FORCE)
 if(TRUE)
-  set(LOREX_DEBUG TRUE)
+  set(SOREX_DEBUG TRUE)
   message(STATUS "[${PROJECT_NAME}] Configuration mode: Debug")
 endif()
 
 # ###############################
 # Sandbox
 # ###############################
-if(LOREX_DEBUG)
+if(SOREX_DEBUG)
   set(SANDBOX_NAME "Sandbox")
   add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/${SANDBOX_NAME}")
 

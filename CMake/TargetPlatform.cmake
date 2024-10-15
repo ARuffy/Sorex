@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 if(NOT TARGET_PLATFORM)
-  message(STATUS "[Lorex] Target platform: '${CMAKE_SYSTEM_NAME}'")
+  message(STATUS "[Sorex] Target platform: '${CMAKE_SYSTEM_NAME}'")
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
         set(TARGET_PLATFORM "TARGET_PLATFORM_WINDOWS")
@@ -24,7 +24,7 @@ if(NOT TARGET_PLATFORM)
     endif()
 endif()
 
-function(lorex_target_compile_definitions TARGET_NAME)
+function(sorex_target_compile_definitions TARGET_NAME)
     message(STATUS "[${TARGET_NAME}] Configuring compile definitions (${CMAKE_SYSTEM_NAME})")
 
     target_compile_definitions(${TARGET_NAME}
@@ -33,9 +33,9 @@ function(lorex_target_compile_definitions TARGET_NAME)
             $<$<CONFIG:Debug>:_DEBUG>
             $<$<CONFIG:Release>:NDEBUG>
     )
-endfunction(lorex_target_compile_definitions)
+endfunction(sorex_target_compile_definitions)
 
-function(lorex_target_compile_options TARGET_NAME)
+function(sorex_target_compile_options TARGET_NAME)
 
 if(MSVC)
     add_compile_options("/permissive-")

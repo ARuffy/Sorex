@@ -1,7 +1,7 @@
 set(SOURCE_FILE_EXTENSION_LIST "c" "cc" "cpp" "cxx")
 set(INCLUDE_FILE_EXTENSION_LIST "h" "hpp")
 
-function(lorex_target_source EXECUTABLE_NAME SOURCE_DIRS)
+function(sorex_target_source EXECUTABLE_NAME SOURCE_DIRS)
     if(SOURCE_DIRS)
         foreach(source_dir IN ITEMS ${SOURCE_DIRS})
             set(src_files_number 0)
@@ -33,4 +33,4 @@ function(lorex_target_source EXECUTABLE_NAME SOURCE_DIRS)
         endforeach()
     endif()
 
-endfunction(lorex_target_source)
+endfunction(sorex_target_source)
