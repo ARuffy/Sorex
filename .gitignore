@@ -1,0 +1,13 @@
+.vs/
+.vscode/
+
+.kdev4/
+*.kdev4
+
+.cache/
+
+build/
+install/
+
+CMakeLists.txt.user
+compile_commands.json
