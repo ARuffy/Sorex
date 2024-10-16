@@ -22,6 +22,9 @@ if(TRUE)
   message(STATUS "[${PROJECT_NAME}] Configuration mode: Debug")
 endif()
 
+set(SOREX_ENGINE_DIR "${CMAKE_CURRENT_LIST_DIR}/Engine")
+add_subdirectory(${SOREX_ENGINE_DIR})
+
 # ###############################
 # Sandbox
 # ###############################

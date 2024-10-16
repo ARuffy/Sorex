@@ -1,0 +1,20 @@
+{
+    "version": 2,
+    "configurePresets": [
+        {
+            "name": "linux_debug",
+            "displayName": "Linux (Debug)",
+            "description": "Using compilers for Linux",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "SRXENG_OPENGL_DEBUG_OUTPUT": "ON",
+                "SRXENG_ADDRESS_SANITIZER": "ON"
+            }
+        }
+    ]
+}
