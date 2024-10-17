@@ -1,5 +1,7 @@
 #pragma once
 
+#include <concepts>
+
 #include "Types.h"
 
 /**
@@ -79,8 +81,8 @@ public:
     RuntimeClass(const RuntimeClass&)            = delete;
     RuntimeClass& operator=(const RuntimeClass&) = delete;
 
-    StrView GetName() const srx_noexcept { return _name; }
-    hash_t  GetHash() const srx_noexcept { return _hash; }
+    StringView GetName() const srx_noexcept { return _name; }
+    hash_t     GetHash() const srx_noexcept { return _hash; }
 
     bool IsA(const RuntimeClass& type) const srx_noexcept { return IsSameType(type) || IsSubclassOf(type); }
 
@@ -107,8 +109,8 @@ private:
       std::is_polymorphic_v<T>
       && (std::is_same_v<typename T::Base, void> || std::is_base_of_v<typename T::Base, T>)
       && (std::is_abstract_v<T> || requires(T t) {
-           { T::GetTypeInfo() } -> std::convertible_to<Ruffy::TypeInfo>;
-           { t.GetRuntimeClass() } -> std::same_as<const Ruffy::RuntimeClass&>;
+           { T::GetTypeInfo() } -> std::convertible_to<Sorex::TypeInfo>;
+           { t.GetRuntimeClass() } -> std::same_as<const Sorex::RuntimeClass&>;
          });
   }
 

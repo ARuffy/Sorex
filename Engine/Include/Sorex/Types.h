@@ -95,20 +95,20 @@ namespace Sorex
   using TPair = std::pair<TFirst, TSecond>;
 
   template<typename T>
-  using TUniquePtr = std::unique_ptr<T>;
+  using TUniquePointer = std::unique_ptr<T>;
   template<typename T>
-  using TSharedPtr = std::shared_ptr<T>;
+  using TSharedPointer = std::shared_ptr<T>;
   template<typename T>
-  using TWeakPtr = std::weak_ptr<T>;
+  using TWeakPointer = std::weak_ptr<T>;
 
   template<typename T, typename... Args>
-  srx_nodiscard srx_inline TUniquePtr<T> MakeUnique(Args&&... args)
+  srx_nodiscard srx_inline TUniquePointer<T> MakeUnique(Args&&... args)
   {
     return std::make_unique<T>(std::forward<Args>(args)...);
   }
 
   template<typename T, typename... Args>
-  srx_nodiscard srx_inline TSharedPtr<T> MakeShared(Args&&... args)
+  srx_nodiscard srx_inline TSharedPointer<T> MakeShared(Args&&... args)
   {
     return std::make_shared<T>(std::forward<Args>(args)...);
   }
