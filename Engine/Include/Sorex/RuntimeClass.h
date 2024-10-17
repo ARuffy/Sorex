@@ -125,7 +125,7 @@ private:
         return rtti;
       }
 
-      static RuntimeClass rtti{ Class::GetTypeInfo(), nullptr };
+      static const RuntimeClass rtti{ Class::GetTypeInfo(), nullptr };
       return rtti;
     }
   }
