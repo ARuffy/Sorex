@@ -67,39 +67,37 @@ private:
   {
 public:
     srx_inline RuntimeClass(const TypeInfo& typeInfo, const RuntimeClass* base) srx_noexcept
-      : _name(typeInfo.GetName())
-      , _hash(typeInfo.GetHash())
-      , _base(base)
+      : mName(typeInfo.GetName())
+      , mHash(typeInfo.GetHash())
+      , mBase(base)
     {}
 
     srx_inline RuntimeClass(StringView name, const hash_t hash, const RuntimeClass* base) srx_noexcept
-      : _name(name)
-      , _hash(hash)
-      , _base(base)
+      : mName(name)
+      , mHash(hash)
+      , mBase(base)
     {}
 
     RuntimeClass(const RuntimeClass&)            = delete;
     RuntimeClass& operator=(const RuntimeClass&) = delete;
 
-    StringView GetName() const srx_noexcept { return _name; }
-    hash_t     GetHash() const srx_noexcept { return _hash; }
+    StringView GetName() const srx_noexcept { return mName; }
+    hash_t     GetHash() const srx_noexcept { return mHash; }
 
-    bool IsA(const RuntimeClass& type) const srx_noexcept { return IsSameType(type) || IsSubclassOf(type); }
+    bool IsA(const RuntimeClass& type) const srx_noexcept;
 
     bool operator==(const RuntimeClass& other) const srx_noexcept { return IsSameType(other); }
     bool operator!=(const RuntimeClass& other) const srx_noexcept { return !IsSameType(other); }
 
 private:
-    const RuntimeClass* GetBaseClass() const srx_noexcept { return _base; }
-
-    bool IsSameType(const RuntimeClass& type) const srx_noexcept { return this == &type; }
-    bool IsSubclassOf(const RuntimeClass& type) const srx_noexcept;
+    inline const RuntimeClass* GetBaseClass() const srx_noexcept { return mBase; }
+    inline bool IsSameType(const RuntimeClass& type) const srx_noexcept { return this == &type; }
 
 private:
-    StringView   _name;
-    const hash_t _hash;
+    StringView   mName;
+    const hash_t mHash;
 
-    const RuntimeClass* const _base;
+    const RuntimeClass* const mBase;
   };
 
   namespace Concept

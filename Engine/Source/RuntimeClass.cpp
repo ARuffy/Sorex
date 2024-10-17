@@ -2,12 +2,19 @@
 
 namespace Sorex
 {
-  bool RuntimeClass::IsSubclassOf(const RuntimeClass& type) const noexcept
+  bool RuntimeClass::IsA(const RuntimeClass& type) const srx_noexcept
   {
-    for (const RuntimeClass* base = _base; base != nullptr; base = base->GetBaseClass())
+    if (IsSameType(type))
+      return true;
+
+    // check the class hirarchy
+    const RuntimeClass* ptrType = mBase;
+    while (ptrType)
     {
-      if (base->IsSameType(type))
+      if (ptrType->IsSameType(type))
         return true;
+
+      ptrType = ptrType->GetBaseClass();
     }
 
     return false;
