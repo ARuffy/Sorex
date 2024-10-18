@@ -1,4 +1,5 @@
 ---
+BasedOnStyle: LLVM
 Language:        Cpp
 AccessModifierOffset: -4
 AlignAfterOpenBracket: Align
@@ -49,7 +50,6 @@ BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: true
-ColumnLimit:     110
 CommentPragmas:  '^ IWYU pragma:'
 CompactNamespaces: true
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -97,7 +97,7 @@ PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 200
 PointerAlignment: Left
-ReflowComments:  false
+ReflowComments: true
 SortIncludes:    false
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false
