@@ -21,6 +21,8 @@
 #define srx_noexcept noexcept
 #define srx_consteval consteval
 #define srx_nodiscard [[nodiscard]]
+// TODO: make in platform
+#define srx_typename
 
 #define SRX_IDLE \
   do             \
