@@ -277,7 +277,7 @@ private:
   }
 
   template<class Type>
-  template<class T>
+  template<class T, class Enable>
   srx_inline void TObjectContainer<Type>::GetAll(TVector<T*>& objects)
     srx_noexcept
   {
