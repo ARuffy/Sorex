@@ -1,8 +1,35 @@
+/**************************************************************************/
+/*                         This file is part of:                          */
+/*                                SOREX                                   */
+/*                 Simple OpenGL Rendering Engine eXtended                */
+/**************************************************************************/
+/* Copyright (c) 2022 Aleksandr Ershov (Ruffy).                           */
+/*                                                                        */
+/* Permission is hereby granted, free of charge, to any person obtaining  */
+/* a copy of this software and associated documentation files (the        */
+/* "Software"), to deal in the Software without restriction, including    */
+/* without limitation the rights to use, copy, modify, merge, publish,    */
+/* distribute, sublicense, and/or sell copies of the Software, and to     */
+/* permit persons to whom the Software is furnished to do so, subject to  */
+/* the following conditions:                                              */
+/*                                                                        */
+/* The above copyright notice and this permission notice shall be         */
+/* included in all copies or substantial portions of the Software.        */
+/*                                                                        */
+/* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        */
+/* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     */
+/* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. */
+/* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY   */
+/* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,   */
+/* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE      */
+/* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
+/**************************************************************************/
+
 #pragma once
 
 #include <type_traits>
 
-#include <Sorex/Types.h>
+#include <Sorex/CoreMinimal.h>
 #include <Sorex/RuntimeClass.h>
 
 namespace Sorex
@@ -30,11 +57,11 @@ public:
     TObjectContainer() = default;
     virtual ~TObjectContainer() { Clear(); }
 
-    Iterator begin() { return _container.begin(); }
-    Iterator end() { return _container.end(); }
+    Iterator begin() { return mContainer.begin(); }
+    Iterator end() { return mContainer.end(); }
 
-    ConstIterator cbegin() const { return _container.cbegin(); }
-    ConstIterator cend() const { return _container.cend(); }
+    ConstIterator cbegin() const { return mContainer.cbegin(); }
+    ConstIterator cend() const { return mContainer.cend(); }
 
     /**
      * @param object - the object pointer
@@ -46,12 +73,12 @@ public:
     /**
      * @return true if the container is empty
      */
-    bool IsEmpty() const srx_noexcept { return _container.empty(); }
+    bool IsEmpty() const srx_noexcept { return mContainer.empty(); }
 
     /**
      * @return number of objects that are stored in container
      */
-    size_t GetSize() const srx_noexcept { return _container.size(); }
+    size_t GetSize() const srx_noexcept { return mContainer.size(); }
 
     /**
      * Move a new object to container. The TObjectContainer owns and manages the
@@ -70,7 +97,7 @@ public:
      * @return pointer to created object or NULL if object wasn't created.
      */
     template<class T, typename... Args>
-    srx_typename TEnableIf_IsSubclassType<T>* Add(Args&&... args);
+    SRX_TYPENAME TEnableIf_IsSubclassType<T>* Add(Args&&... args);
 
     /**
      * Release the object from container by pointer.
@@ -79,7 +106,7 @@ public:
      * @return unique pointer that points to the removed object or NULL if
      * object wasn't found.
      */
-    template<class T, class Enable = srx_typename TEnableIf_IsSubclassType<T>>
+    template<class T, class Enable = SRX_TYPENAME TEnableIf_IsSubclassType<T>>
     srx_nodiscard TUniquePointer<T> Release(const T* object) srx_noexcept;
 
     /**
@@ -88,7 +115,7 @@ public:
      * @return unique pointer that points to the removed object or NULL if
      * object wasn't found.
      */
-    template<class T, class Enable = srx_typename TEnableIf_IsSubclassType<T>>
+    template<class T, class Enable = SRX_TYPENAME TEnableIf_IsSubclassType<T>>
     srx_nodiscard TUniquePointer<T> Release() srx_noexcept;
 
     /**
@@ -101,7 +128,7 @@ public:
     /**
      * Remove all objects with the type from the container and destroy them
      */
-    template<class T, class Enable = srx_typename TEnableIf_IsSubclassType<T>>
+    template<class T, class Enable = SRX_TYPENAME TEnableIf_IsSubclassType<T>>
     void RemoveAll() srx_noexcept;
 
     /**
@@ -112,25 +139,25 @@ public:
     /**
      * @return first found object by type
      */
-    template<class T, class Enable = srx_typename TEnableIf_IsSubclassType<T>>
+    template<class T, class Enable = SRX_TYPENAME TEnableIf_IsSubclassType<T>>
     const T* Get() const srx_noexcept;
 
     /**
      * @return first found object by type
      */
     template<class T>
-    srx_typename TEnableIf_IsSubclassType<T>* Get() srx_noexcept;
+    SRX_TYPENAME TEnableIf_IsSubclassType<T>* Get() srx_noexcept;
 
     /**
      * @return all found object by type
      */
-    template<class T, class Enable = srx_typename TEnableIf_IsSubclassType<T>>
+    template<class T, class Enable = SRX_TYPENAME TEnableIf_IsSubclassType<T>>
     srx_inline void GetAll(TVector<T*>& objects) srx_noexcept;
 
     /**
      * @return all found object by type
      */
-    template<class T, class Enable = srx_typename TEnableIf_IsSubclassType<T>>
+    template<class T, class Enable = SRX_TYPENAME TEnableIf_IsSubclassType<T>>
     srx_inline void GetAll(TVector<const T*>& objects) const srx_noexcept;
 
 private:
@@ -149,14 +176,14 @@ private:
     srx_inline Iterator Find() srx_noexcept;
 
 private:
-    Container _container;
+    Container mContainer;
   };
 
   template<class Type>
   srx_inline bool TObjectContainer<Type>::Contains(const Type* object) const
     srx_noexcept
   {
-    return Find(object) != _container.cend();
+    return Find(object) != mContainer.cend();
   }
 
   template<class Type>
@@ -166,7 +193,7 @@ private:
       return nullptr;
 
     Type* result = object.get();
-    _container.push_back(std::move(object));
+    mContainer.push_back(std::move(object));
 
     return result;
   }
@@ -184,10 +211,10 @@ private:
   srx_nodiscard TUniquePointer<T> TObjectContainer<Type>::Release(
     const T* object) srx_noexcept
   {
-    if (auto it = Find(object); it != _container.end())
+    if (auto it = Find(object); it != mContainer.end())
     {
       T* const ptr = static_cast<T*>(it->release());
-      _container.erase(it);
+      mContainer.erase(it);
       return TUniquePointer<T>(ptr);
     }
 
@@ -199,10 +226,10 @@ private:
   srx_nodiscard TUniquePointer<T> TObjectContainer<Type>::Release() srx_noexcept
   {
     const RuntimeClass& type = GetRuntimeType<T>();
-    if (Iterator it = Find(type); it != _container.end())
+    if (Iterator it = Find(type); it != mContainer.end())
     {
       T* const ptr = static_cast<T*>(it->release());
-      _container.erase(it);
+      mContainer.erase(it);
       return TUniquePointer<T>(ptr);
     }
 
@@ -212,9 +239,9 @@ private:
   template<class Type>
   bool TObjectContainer<Type>::Remove(const Type* object) srx_noexcept
   {
-    if (Iterator it = Find(object); it != _container.end())
+    if (Iterator it = Find(object); it != mContainer.end())
     {
-      _container.erase(it);
+      mContainer.erase(it);
       return true;
     }
 
@@ -226,13 +253,13 @@ private:
   void TObjectContainer<Type>::RemoveAll() srx_noexcept
   {
     const RuntimeClass& cls = GetRuntimeType<T>();
-    _container.erase(
-      std::remove_if(_container.begin(),
-                     _container.end(),
+    mContainer.erase(
+      std::remove_if(mContainer.begin(),
+                     mContainer.end(),
                      [&](const TUniquePointer<Type>& item) {
                        return item && item->GetRuntimeClass().IsA(cls);
                      }),
-      _container.end());
+      mContainer.end());
   }
 
   template<class Type>
@@ -241,17 +268,17 @@ private:
     // NOTE: we must delete all object in reverse order.
     // In this case we guarantee that injected dependencies work properly during
     // the objects destruction.
-    for (auto it = _container.rbegin(); it != _container.rend(); ++it)
+    for (auto it = mContainer.rbegin(); it != mContainer.rend(); ++it)
       it->reset();
 
-    _container.clear();
+    mContainer.clear();
   }
 
   template<class Type>
   template<class T, class Enable>
   const T* TObjectContainer<Type>::Get() const srx_noexcept
   {
-    if (ConstIterator it = Find(GetRuntimeType<T>()); it != _container.cend())
+    if (ConstIterator it = Find(GetRuntimeType<T>()); it != mContainer.cend())
       return static_cast<T*>(it->get());
 
     return nullptr;
@@ -262,7 +289,7 @@ private:
   typename TObjectContainer<Type>::template TEnableIf_IsSubclassType<T>*
   TObjectContainer<Type>::Get() srx_noexcept
   {
-    if (Iterator it = Find(GetRuntimeType<T>()); it != _container.end())
+    if (Iterator it = Find(GetRuntimeType<T>()); it != mContainer.end())
       return static_cast<T*>(it->get());
 
     return nullptr;
@@ -294,9 +321,9 @@ private:
                   "[TObjectContainer] GetAll objects of invalid runtime class");
 
     objects.clear();
-    objects.reserve(_container.size());
+    objects.reserve(mContainer.size());
 
-    for (ConstIterator it = _container.cbegin(); it != _container.cend(); ++it)
+    for (ConstIterator it = mContainer.cbegin(); it != mContainer.cend(); ++it)
     {
       if (const TUniquePointer<Type>& item = (*it);
           item && item->GetRuntimeClass().IsA(type))
@@ -313,9 +340,9 @@ private:
                   "[TObjectContainer] GetAll objects of invalid runtime class");
 
     objects.clear();
-    objects.reserve(_container.size());
+    objects.reserve(mContainer.size());
 
-    for (Iterator it = _container.begin(); it != _container.end(); ++it)
+    for (Iterator it = mContainer.begin(); it != mContainer.end(); ++it)
     {
       if (const TUniquePointer<Type>& item = (*it);
           item && item->GetRuntimeClass().IsA(type))
@@ -327,8 +354,8 @@ private:
   srx_inline typename TObjectContainer<Type>::Iterator
   TObjectContainer<Type>::Find(const Type* object) srx_noexcept
   {
-    return std::find_if(_container.begin(),
-                        _container.end(),
+    return std::find_if(mContainer.begin(),
+                        mContainer.end(),
                         [object](const TUniquePointer<Type>& element) {
                           return element.get() == object;
                         });
@@ -338,8 +365,8 @@ private:
   srx_inline typename TObjectContainer<Type>::ConstIterator
   TObjectContainer<Type>::Find(const Type* object) const srx_noexcept
   {
-    return std::find_if(_container.cbegin(),
-                        _container.cend(),
+    return std::find_if(mContainer.cbegin(),
+                        mContainer.cend(),
                         [object](const TUniquePointer<Type>& element) {
                           return element.get() == object;
                         });
@@ -349,8 +376,8 @@ private:
   srx_inline typename TObjectContainer<Type>::Iterator
   TObjectContainer<Type>::Find(const RuntimeClass& type) srx_noexcept
   {
-    return std::find_if(_container.begin(),
-                        _container.end(),
+    return std::find_if(mContainer.begin(),
+                        mContainer.end(),
                         [&type](const TUniquePointer<Type>& element) {
                           return element->GetRuntimeClass().IsA(type);
                         });
@@ -360,8 +387,8 @@ private:
   srx_inline typename TObjectContainer<Type>::ConstIterator
   TObjectContainer<Type>::Find(const RuntimeClass& type) const srx_noexcept
   {
-    return std::find_if(_container.cbegin(),
-                        _container.cend(),
+    return std::find_if(mContainer.cbegin(),
+                        mContainer.cend(),
                         [&type](const TUniquePointer<Type>& item) {
                           return item->GetRuntimeClass().IsA(type);
                         });

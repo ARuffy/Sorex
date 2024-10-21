@@ -1,8 +1,35 @@
+/**************************************************************************/
+/*                         This file is part of:                          */
+/*                                SOREX                                   */
+/*                 Simple OpenGL Rendering Engine eXtended                */
+/**************************************************************************/
+/* Copyright (c) 2022 Aleksandr Ershov (Ruffy).                           */
+/*                                                                        */
+/* Permission is hereby granted, free of charge, to any person obtaining  */
+/* a copy of this software and associated documentation files (the        */
+/* "Software"), to deal in the Software without restriction, including    */
+/* without limitation the rights to use, copy, modify, merge, publish,    */
+/* distribute, sublicense, and/or sell copies of the Software, and to     */
+/* permit persons to whom the Software is furnished to do so, subject to  */
+/* the following conditions:                                              */
+/*                                                                        */
+/* The above copyright notice and this permission notice shall be         */
+/* included in all copies or substantial portions of the Software.        */
+/*                                                                        */
+/* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,        */
+/* EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF     */
+/* MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. */
+/* IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY   */
+/* CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,   */
+/* TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE      */
+/* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
+/**************************************************************************/
+
 #pragma once
 
 #include <concepts>
 
-#include "Types.h"
+#include "CoreMinimal.h"
 
 /**
  * Run-Time Type Information is a simple implementation of rtti system.
@@ -11,7 +38,7 @@
  */
 namespace Sorex
 {
-  namespace Details
+  namespace Rtti::Details
   {
     template<typename = hash_t>
     struct fnv_1a_params;
@@ -47,7 +74,7 @@ public:
 private:
     static constexpr hash_t MakeHash(StringView view) srx_noexcept
     {
-      using params = Details::fnv_1a_params<>;
+      using params = Rtti::Details::fnv_1a_params<>;
       hash_t hash  = params::offset;
       for (auto&& curr : view)
       {
@@ -118,30 +145,27 @@ private:
   namespace Concept
   {
     template<typename T>
-    concept RuntimeClass = std::is_polymorphic_v<T>
-                           && (std::is_same_v<typename T::Base, void>
-                               || std::is_base_of_v<typename T::Base, T>)
-                           && (std::is_abstract_v<T> || requires(T t) {
-                                {
-                                  T::GetTypeInfo()
-                                } -> std::convertible_to<Sorex::TypeInfo>;
-                                {
-                                  t.GetRuntimeClass()
-                                } -> std::same_as<const Sorex::RuntimeClass&>;
-                              });
+    concept RuntimeClass =
+      std::is_polymorphic_v<T>
+      && (std::is_same_v<typename T::SorexRttiBase, void>
+          || std::is_base_of_v<typename T::SorexRttiBase, T>)
+      && (std::is_abstract_v<T> || requires(T t) {
+           { T::GetTypeInfo() } -> std::convertible_to<Sorex::TypeInfo>;
+           { t.GetRuntimeClass() } -> std::same_as<const Sorex::RuntimeClass&>;
+         });
   }
 
-  namespace Details
+  namespace Rtti::Details
   {
     template<Concept::RuntimeClass Class>
     const RuntimeClass& GetOrCreateRuntimeType() srx_noexcept
     {
-      if constexpr (!std::is_same_v<typename Class::Base, void>)
+      if constexpr (!std::is_same_v<typename Class::SorexRttiBase, void>)
       {
         static RuntimeClass rtti{
           Class::GetTypeInfo(),
           std::addressof<const RuntimeClass>(
-            GetOrCreateRuntimeType<typename Class::Base>())
+            GetOrCreateRuntimeType<typename Class::SorexRttiBase>())
         };
         return rtti;
       }
@@ -166,7 +190,7 @@ private:
   template<Concept::RuntimeClass Class>
   constexpr const RuntimeClass& GetRuntimeType() srx_noexcept
   {
-    return Details::GetOrCreateRuntimeType<Class>();
+    return Rtti::Details::GetOrCreateRuntimeType<Class>();
   }
 
   template<Concept::RuntimeClass DesiredType, Concept::RuntimeClass Type>
@@ -199,52 +223,52 @@ private:
 
 #define SRX_RTTI_BASE(TYPE)                                                 \
   private:                                                                  \
-  srx_inline static constexpr Sorex::TypeInfo __sorexTypeInfo{ #TYPE };     \
+  static constexpr ::Sorex::TypeInfo __sorexTypeInfo{ #TYPE };              \
                                                                             \
   public:                                                                   \
-  typedef void                     Base;                                    \
-  static constexpr Sorex::TypeInfo GetTypeInfo() srx_noexcept               \
+  typedef void                       SorexRttiBase;                         \
+  static constexpr ::Sorex::TypeInfo GetTypeInfo() srx_noexcept             \
   {                                                                         \
     return __sorexTypeInfo;                                                 \
   }                                                                         \
   template<Sorex::Concept::RuntimeClass Class>                              \
   srx_inline bool IsA() const srx_noexcept                                  \
   {                                                                         \
-    return Sorex::InstanceOf<Class>(*this);                                 \
+    return ::Sorex::InstanceOf<Class>(*this);                               \
   }                                                                         \
-  virtual const Sorex::RuntimeClass& GetRuntimeClass() const srx_noexcept   \
+  virtual const ::Sorex::RuntimeClass& GetRuntimeClass() const srx_noexcept \
   {                                                                         \
     typedef std::remove_const_t<std::remove_pointer_t<decltype(this)>>      \
       ObjectType;                                                           \
     static_assert(std::is_same_v<TYPE, ObjectType>, "invalid object type"); \
-    static const Sorex::RuntimeClass& rtti =                                \
-      ::Sorex::Details::GetOrCreateRuntimeType<ObjectType>();               \
+    static const ::Sorex::RuntimeClass& rtti =                              \
+      ::Sorex::Rtti::Details::GetOrCreateRuntimeType<ObjectType>();         \
     return rtti;                                                            \
   }                                                                         \
                                                                             \
   private:
 
-#define SRX_RTTI(TYPE, BASE)                                            \
-  private:                                                              \
-  srx_inline static constexpr Sorex::TypeInfo __sorexTypeInfo{ #TYPE }; \
-                                                                        \
-  public:                                                               \
-  typedef BASE                     Base;                                \
-  static constexpr Sorex::TypeInfo GetTypeInfo() srx_noexcept           \
-  {                                                                     \
-    return __sorexTypeInfo;                                             \
-  }                                                                     \
-  virtual const Sorex::RuntimeClass& GetRuntimeClass()                  \
-    const srx_noexcept               override                           \
-  {                                                                     \
-    typedef std::remove_const_t<std::remove_pointer_t<decltype(this)>>  \
-      ObjectType;                                                       \
-    static_assert(std::is_base_of_v<BASE, ObjectType>                   \
-                    && !std::is_same_v<BASE, ObjectType>,               \
-                  "base and derived classes are unrelated");            \
-    static const Sorex::RuntimeClass& rtti =                            \
-      ::Sorex::Details::GetOrCreateRuntimeType<ObjectType>();           \
-    return rtti;                                                        \
-  }                                                                     \
-                                                                        \
+#define SRX_RTTI(TYPE, BASE)                                           \
+  private:                                                             \
+  static constexpr ::Sorex::TypeInfo __sorexTypeInfo{ #TYPE };         \
+                                                                       \
+  public:                                                              \
+  typedef BASE                       SorexRttiBase;                    \
+  static constexpr ::Sorex::TypeInfo GetTypeInfo() srx_noexcept        \
+  {                                                                    \
+    return __sorexTypeInfo;                                            \
+  }                                                                    \
+  virtual const ::Sorex::RuntimeClass& GetRuntimeClass()               \
+    const srx_noexcept                 override                        \
+  {                                                                    \
+    typedef std::remove_const_t<std::remove_pointer_t<decltype(this)>> \
+      ObjectType;                                                      \
+    static_assert(std::is_base_of_v<BASE, ObjectType>                  \
+                    && !std::is_same_v<BASE, ObjectType>,              \
+                  "base and derived classes are unrelated");           \
+    static const ::Sorex::RuntimeClass& rtti =                         \
+      ::Sorex::Rtti::Details::GetOrCreateRuntimeType<ObjectType>();    \
+    return rtti;                                                       \
+  }                                                                    \
+                                                                       \
   private:
