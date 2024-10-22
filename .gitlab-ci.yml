@@ -1,0 +1,28 @@
+stages:
+  - test
+
+test-engine:
+  stage: test
+    image:
+      name: debian:bookworm
+      pull_policy: always # available: always, if-not-present, never
+    variables:
+      CI_BUILD_TEST_PRESET: "unit_tests"
+      CI_ENGINE_GTEST_EXE: SorexEngineUnitTests
+    before_script:
+      - apt-get update
+      - apt-get -y install clang cmake libgtest-dev
+    script:
+      - mkdir ./build
+      - cmake --version
+      - cmake --preset ${CI_BUILD_TEST_PRESET}
+      - cmake --build ./build
+      - ./build/${CI_BUILD_TEST_PRESET}/Engine/Test/${CI_ENGINE_GTEST_EXE} --gtest_output="xml:./gtest-result.xml"
+    artifacts:
+      when: always
+      reports:
+        junit: ./gtest-result.xml
+    only:
+      - develop
+      - main
+    tags: [saas-linux-small-amd64]
