@@ -27,11 +27,17 @@ endif()
 function(sorex_target_compile_definitions TARGET_NAME)
   message(
     STATUS
-      "[${TARGET_NAME}] Configuring compile definitions (${CMAKE_SYSTEM_NAME})")
+      "[${TARGET_NAME}] Configuring compile definitions (${CMAKE_SYSTEM_NAME})"
+  )
 
   target_compile_definitions(
-    ${TARGET_NAME} PUBLIC ${TARGET_PLATFORM}=1 $<$<CONFIG:Debug>:_DEBUG>
-                          $<$<CONFIG:Release>:NDEBUG>)
+    ${TARGET_NAME}
+    PUBLIC ${TARGET_PLATFORM}=1
+           $<$<CONFIG:Debug>:SOREX_DEBUG_MODE=2>
+           $<$<CONFIG:Debug>:_DEBUG>
+           $<$<CONFIG:Release>:NDEBUG>
+           $<$<CONFIG:Release>:SOREX_DEBUG_MODE=1>
+  )
 endfunction(sorex_target_compile_definitions)
 
 function(sorex_target_compile_options TARGET_NAME)
@@ -52,7 +58,8 @@ function(sorex_target_compile_options TARGET_NAME)
                 "-Werror"
                 "-Wextra"
                 "-fno-omit-frame-pointer"
-                "-Wno-unused-parameter")
+                "-Wno-unused-parameter"
+      )
     endif()
   endif()
 

@@ -1,0 +1,7 @@
+---
+line_width: 80
+tab_size: 2
+max_pargs_hwrap: 4
+dangle_align: 'prefix'
+dangle_parens: True
+keyword_case: 'upper'
