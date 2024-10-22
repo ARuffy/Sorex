@@ -94,7 +94,6 @@ namespace Sorex
 #  define SOREX_TARGET_PLATFORM (::Sorex::ETargetPlatform::kLinux)
 #  define SOREX_PLATFORM_LINUX (1)
 
-// FIXME: Check it
 #elif defined(__APPLE_CC__) || defined(TARGET_PLATFORM_MACOSX) \
   || defined(TARGET_PLATFORM_IOS)
 #  if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 60000 \
