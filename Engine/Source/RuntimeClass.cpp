@@ -34,7 +34,7 @@ namespace Sorex
     if (IsSameType(type))
       return true;
 
-    // check the class hirarchy
+    // Check the class hirarchy
     const RuntimeClass* ptrType = mBase;
     while (ptrType)
     {
