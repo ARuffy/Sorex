@@ -37,11 +37,11 @@ function(sorex_target_compile_definitions TARGET_NAME)
            $<$<CONFIG:Debug>:_DEBUG>
            $<$<CONFIG:Release>:NDEBUG>
            $<$<CONFIG:Release>:SOREX_DEBUG_MODE=1>
+           $<$<CONFIG:RelMinSize>:SOREX_DEBUG_MODE=0>
   )
 endfunction(sorex_target_compile_definitions)
 
 function(sorex_target_compile_options TARGET_NAME)
-
   if(MSVC)
     add_compile_options("/permissive-")
     target_compile_options(${TARGET_NAME} PRIVATE "/WX")
