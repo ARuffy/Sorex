@@ -38,25 +38,11 @@
  */
 namespace Sorex
 {
-  namespace Rtti::Details
+  namespace Concept
   {
-    template<typename = hash_t>
-    struct fnv_1a_params;
-
-    template<>
-    struct fnv_1a_params<uint32_t>
-    {
-      static constexpr auto offset = 2166136261;
-      static constexpr auto prime  = 16777619;
-    };
-
-    template<>
-    struct fnv_1a_params<uint64_t>
-    {
-      static constexpr auto offset = 14695981039346656037ULL;
-      static constexpr auto prime  = 1099511628211ULL;
-    };
-  }  // namespace
+    template<typename T>
+    concept UnsignedIntegral = std::is_integral_v<T> && std::is_unsigned_v<T>;
+  }
 
   /*
    * TODO: Add documentation
@@ -65,22 +51,37 @@ namespace Sorex
    */
   struct TypeInfo
   {
+    template<Concept::UnsignedIntegral T>
+    struct Hasher
+    {
+  private:
+      static_assert(sizeof(T) >= sizeof(uint32), "invalid hash type");
+
+      static constexpr T offset = (sizeof(T) <= sizeof(uint32))
+                                    ? T{ 2166136261UL }
+                                    : T{ 14695981039346656037ULL };
+      static constexpr T prime =
+        (sizeof(T) <= sizeof(uint32)) ? T{ 16777619UL } : T{ 1099511628211ULL };
+
+  public:
+      static constexpr hash_t MakeHash(StringView view) srx_noexcept
+      {
+        hash_t hash = offset;
+        for (auto&& curr : view)
+        {
+          hash = (hash ^ static_cast<hash_t>(curr)) * prime;
+        }
+        return hash;
+      }
+    };
+
 public:
     explicit srx_consteval TypeInfo(const char* str) srx_noexcept: mName(str) {}
 
-    constexpr hash_t GetHash() const srx_noexcept { return MakeHash(mName); }
     constexpr StringView GetName() const srx_noexcept { return mName; }
-
-private:
-    static constexpr hash_t MakeHash(StringView view) srx_noexcept
+    constexpr hash_t     GetHash() const srx_noexcept
     {
-      using params = Rtti::Details::fnv_1a_params<>;
-      hash_t hash  = params::offset;
-      for (auto&& curr : view)
-      {
-        hash = (hash ^ static_cast<hash_t>(curr)) * params::prime;
-      }
-      return hash;
+      return Hasher<hash_t>::MakeHash(mName);
     }
 
 private:
@@ -149,10 +150,15 @@ private:
       std::is_polymorphic_v<T>
       && (std::is_same_v<typename T::SorexRttiBase, void>
           || std::is_base_of_v<typename T::SorexRttiBase, T>)
-      && (std::is_abstract_v<T> || requires(T t) {
-           { T::GetTypeInfo() } -> std::convertible_to<Sorex::TypeInfo>;
-           { t.GetRuntimeClass() } -> std::same_as<const Sorex::RuntimeClass&>;
-         });
+      && (std::is_abstract_v<T>
+          || requires(T t) {
+               {
+                 T::GetTypeInfo()
+                 } -> std::convertible_to<Sorex::TypeInfo>;
+               {
+                 t.GetRuntimeClass()
+                 } -> std::same_as<const Sorex::RuntimeClass&>;
+             });
   }
 
   namespace Rtti::Details

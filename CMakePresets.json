@@ -2,31 +2,42 @@
   "version": 2,
   "configurePresets": [
     {
-      "name": "linux_debug",
-      "displayName": "Linux (Debug)",
-      "description": "Using compilers for Linux",
-      "generator": "Unix Makefiles",
+      "name": "unix_debug",
+      "hidden": true,
+      "displayName": "Unix Base (Debug)",
+      "description": "Debug build preset for Unix based operating systems",
+      "generator": "Ninja",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
         "CMAKE_C_COMPILER": "/usr/bin/clang",
         "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "SRXENG_OPENGL_DEBUG_OUTPUT": "ON",
         "SRXENG_ADDRESS_SANITIZER": "ON"
       }
     },
     {
-      "name": "linux_tests",
-      "displayName": "Linux (Tests)",
-      "description": "Engine unit tests for Linux",
+      "name": "linux_debug",
+      "displayName": "Linux (Debug)",
+      "description": "Debug Linux build",
+      "inherits": "unix_debug"
+    },
+    {
+      "name": "macos_debug",
+      "displayName": "MacOS (Debug)",
+      "description": "Debug MacOS build",
+      "inherits": "unix_debug"
+    },
+    {
+      "name": "unit_tests",
+      "displayName": "Sorex Unit Tests",
+      "description": "Engine unit tests",
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
-        "SRXENG_DISABLE_CHECK": "ON",
-        "SRXENG_DISABLE_LOGGING": "ON",
-        "SOREX_BUILD_TESTS": "ON",
-        "SOREX_BUILD_SANDBOX": "OFF"
+        "CMAKE_BUILD_TYPE": "MinSizeRel",
+        "SOREX_BUILD_SANDBOX": "OFF",
+        "SOREX_BUILD_TESTS": "ON"
       }
     }
   ]

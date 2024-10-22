@@ -49,6 +49,8 @@ namespace Sorex
   {
     kWin32,
     kLinux,
+    kMacOS,
+    kAppleIOS,
     kAndroid
   };
 
@@ -67,13 +69,13 @@ namespace Sorex
 #  if SOREX_DEBUG_MODE == 0
 #    define SOREX_DEBUG_NONE (1)
 #  else
-#    if SOREX_DEBUG_MODE >= ::Sorex::EDebugMode::kLow
+#    if SOREX_DEBUG_MODE >= 1  // ::Sorex::EDebugMode::kLow
 #      define SOREX_DEBUG_LOW (1)
 #    endif
-#    if SOREX_DEBUG_MODE >= ::Sorex::EDebugMode::kMedium
+#    if SOREX_DEBUG_MODE >= 2  // ::Sorex::EDebugMode::kMedium
 #      define SOREX_DEBUG_MEDIUM (1)
 #    endif
-#    if SOREX_DEBUG_MODE >= ::Sorex::EDebugMode::kHigh
+#    if SOREX_DEBUG_MODE >= 3  //::Sorex::EDebugMode::kHigh
 #      define SOREX_DEBUG_HIGH (1)
 #    endif
 #  endif
@@ -91,6 +93,19 @@ namespace Sorex
 #elif defined(TARGET_PLATFORM_LINUX)
 #  define SOREX_TARGET_PLATFORM (::Sorex::ETargetPlatform::kLinux)
 #  define SOREX_PLATFORM_LINUX (1)
+
+// FIXME: Check it
+#elif defined(__APPLE_CC__) || defined(TARGET_PLATFORM_MACOSX) \
+  || defined(TARGET_PLATFORM_IOS)
+#  if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 60000 \
+    || __IPHONE_OS_VERSION_MIN_REQUIRED >= 60000
+#    define SOREX_TARGET_PLATFORM (::Sorex::ETargetPlatform::kAppleIOS)
+#    define SOREX_PLATFORM_IOS (1)
+#  else
+#    define SOREX_TARGET_PLATFORM (::Sorex::ETargetPlatform::kMacOS)
+#    define SOREX_PLATFORM_MACOSX (1)
+#  endif
+
 #else
 #  pragma error "Sorex doesn't support target platform!"
 #endif
@@ -110,13 +125,13 @@ namespace Sorex
 #  define SOREX_COMPILER (::Sorex::ESorexCompiler::CLANG)
 #  define SOREX_COMPILER_CLANG (1)
 #  define SOREX_COMP_VER \
-    (((__clang_major__) * 100) + (__clang_minor__ * 10) + __clang_patchlevel__)
+    (((__clang_major__)*100) + (__clang_minor__ * 10) + __clang_patchlevel__)
 
 #elif defined(__GNUC__)
 #  define SOREX_COMPILER (::Sorex::ESorexCompiler::GNUC)
 #  define SOREX_COMPILER_GNUC (1)
 #  define SOREX_COMP_VER \
-    (((__GNUC__) * 100) + (__GNUC_MINOR__ * 10) + __GNUC_PATCHLEVEL__)
+    (((__GNUC__)*100) + (__GNUC_MINOR__ * 10) + __GNUC_PATCHLEVEL__)
 
 #else
 #  pragma error "Sorex unknown compiler. Abort!"
