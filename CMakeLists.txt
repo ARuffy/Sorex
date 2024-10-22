@@ -11,14 +11,16 @@ project(
   VERSION 0.1.0
   DESCRIPTION "Simple OpenGL Rendering Engine eXtended"
   # [HOMEPAGE_URL <url-string>]
-  LANGUAGES C CXX)
+  LANGUAGES C CXX
+)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(CMAKE_CONFIGURATION_TYPES
     "Debug;Release"
-    CACHE STRING "Configuration types" FORCE)
+    CACHE STRING "Configuration types" FORCE
+)
 
 option(SOREX_BUILD_SANDBOX "Build sandbox application" ON)
 option(SOREX_BUILD_TESTS "Build tests." OFF)
@@ -34,8 +36,10 @@ if(SOREX_BUILD_SANDBOX)
   add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/${SANDBOX_NAME}")
 
   if(MSVC)
-    set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-                 PROPERTY VS_STARTUP_PROJECT ${SANDBOX_NAME})
+    set_property(
+      DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT
+                                                     ${SANDBOX_NAME}
+    )
   endif()
 endif()
 

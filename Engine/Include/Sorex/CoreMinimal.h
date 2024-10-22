@@ -3,7 +3,7 @@
 /*                                SOREX                                   */
 /*                 Simple OpenGL Rendering Engine eXtended                */
 /**************************************************************************/
-/* Copyright (c) 2022 Aleksandr Ershov (Ruffy).                           */
+/* Copyright (c) 2022-2024 Aleksandr Ershov (Ruffy).                      */
 /*                                                                        */
 /* Permission is hereby granted, free of charge, to any person obtaining  */
 /* a copy of this software and associated documentation files (the        */
@@ -25,25 +25,8 @@
 /* SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                 */
 /**************************************************************************/
 
-#include <Sorex/RuntimeClass.h>
+#pragma once
 
-namespace Sorex
-{
-  bool RuntimeClass::IsA(const RuntimeClass& type) const srx_noexcept
-  {
-    if (IsSameType(type))
-      return true;
-
-    // check the class hirarchy
-    const RuntimeClass* ptrType = mBase;
-    while (ptrType)
-    {
-      if (ptrType->IsSameType(type))
-        return true;
-
-      ptrType = ptrType->GetBaseClass();
-    }
-
-    return false;
-  }
-}
+#include <Sorex/Types.h>
+#include <Sorex/Platform.h>
+#include <Sorex/Assert.h>

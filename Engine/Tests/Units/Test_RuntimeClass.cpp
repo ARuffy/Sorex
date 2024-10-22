@@ -7,25 +7,27 @@
 
 using namespace Sorex;
 
-#define TEST_MAKE_BASECLASS(NAME) \
-  class Test_##NAME               \
-  {                               \
-    SRX_RTTI_BASE(Test_##NAME)    \
-public:                           \
-    virtual ~Test_##NAME()        \
-    {}                            \
-  };                              \
-  static const String kTestString_##NAME = String(String("Test_") + String(#NAME))
+#define TEST_MAKE_BASECLASS(NAME)          \
+  class Test_##NAME                        \
+  {                                        \
+    SRX_RTTI_BASE(Test_##NAME)             \
+public:                                    \
+    virtual ~Test_##NAME()                 \
+    {}                                     \
+  };                                       \
+  static const String kTestString_##NAME = \
+    String(String("Test_") + String(#NAME))
 
-#define TEST_MAKE_CLASS(NAME, BASE)     \
-  class Test_##NAME: public Test_##BASE \
-  {                                     \
-    SRX_RTTI(Test_##NAME, Test_##BASE)  \
-public:                                 \
-    virtual ~Test_##NAME() override     \
-    {}                                  \
-  };                                    \
-  static const String kTestString_##NAME = String(String("Test_") + String(#NAME))
+#define TEST_MAKE_CLASS(NAME, BASE)        \
+  class Test_##NAME: public Test_##BASE    \
+  {                                        \
+    SRX_RTTI(Test_##NAME, Test_##BASE)     \
+public:                                    \
+    virtual ~Test_##NAME() override        \
+    {}                                     \
+  };                                       \
+  static const String kTestString_##NAME = \
+    String(String("Test_") + String(#NAME))
 
 namespace
 {
@@ -41,26 +43,32 @@ namespace
   TEST_MAKE_BASECLASS(Base2);
 
 
-  bool IsDifferentRuntimeClass(const RuntimeClass& lhs, const RuntimeClass& rhs) noexcept
+  bool IsDifferentRuntimeClass(const RuntimeClass& lhs,
+                               const RuntimeClass& rhs) noexcept
   {
-    return lhs != rhs && lhs.GetHash() != rhs.GetHash() && lhs.GetName() != rhs.GetName();
+    return lhs != rhs && lhs.GetHash() != rhs.GetHash()
+           && lhs.GetName() != rhs.GetName();
   }
 
-  template<typename T, typename Base = typename T::Base>
+  template<typename T, typename Base = typename T::SorexRttiBase>
   bool IsValidHierarchy() noexcept
   {
     if constexpr (!std::is_same_v<T, void> && !std::is_same_v<Base, void>)
     {
-      // std::cout << "Check runtime classes: '" << GetTypeName<T>() << "' vs '" << GetTypeName<Base>()
+      // std::cout << "Check runtime classes: '" << GetTypeName<T>() << "' vs '"
+      // << GetTypeName<Base>()
       //           << "'\n";
 
       TUniquePointer<Base> baseObj = MakeUnique<T>();
 
-      return DynamicCast<T*>(baseObj.get()) && DynamicCast<const T*>(baseObj.get())
+      return DynamicCast<T*>(baseObj.get())
+             && DynamicCast<const T*>(baseObj.get())
              && GetRuntimeType<T>().IsA(GetRuntimeType<Base>())
-             && IsDifferentRuntimeClass(GetRuntimeType<T>(), GetRuntimeType<Base>())
-             && IsValidHierarchy<T, typename Base::Base>()
-             && IsValidHierarchy<typename T::Base, typename Base::Base>();
+             && IsDifferentRuntimeClass(GetRuntimeType<T>(),
+                                        GetRuntimeType<Base>())
+             && IsValidHierarchy<T, typename Base::SorexRttiBase>()
+             && IsValidHierarchy<typename T::SorexRttiBase,
+                                 typename Base::SorexRttiBase>();
     }
 
     return true;
@@ -70,8 +78,9 @@ namespace
 TEST(RuntimeClass, CompileTime)
 {
   // compile-time check
-  constexpr size_t hash_size           = (static_cast<size_t>(Test_Base1::GetTypeInfo().GetHash()) % 255) + 1;
-  unsigned char    hash_buf[hash_size] = { 0 };
+  constexpr size_t hash_size =
+    (static_cast<size_t>(Test_Base1::GetTypeInfo().GetHash()) % 255) + 1;
+  unsigned char hash_buf[hash_size] = { 0 };
 
   constexpr size_t str_size           = GetTypeName<Test_Base1>().length();
   unsigned char    str_bufp[str_size] = { 0 };
@@ -80,24 +89,28 @@ TEST(RuntimeClass, CompileTime)
 TEST(RuntimeClass, Base)
 {
   EXPECT_EQ(Test_Base1::GetTypeInfo().GetName(), kTestString_Base1);
-  EXPECT_EQ(Test_Base1::GetTypeInfo().GetName(), StringView(Test_Base1::GetTypeInfo().GetName()));
+  EXPECT_EQ(Test_Base1::GetTypeInfo().GetName(),
+            StringView(Test_Base1::GetTypeInfo().GetName()));
   EXPECT_EQ(Test_Base1::GetTypeInfo().GetName(), GetTypeName<Test_Base1>());
   EXPECT_NE(Test_Base1::GetTypeInfo().GetHash(), 0);
 
   Test_Base1 b1;
   EXPECT_EQ(b1.GetRuntimeClass().GetName(), kTestString_Base1);
-  EXPECT_EQ(b1.GetRuntimeClass().GetHash(), Test_Base1::GetTypeInfo().GetHash());
+  EXPECT_EQ(b1.GetRuntimeClass().GetHash(),
+            Test_Base1::GetTypeInfo().GetHash());
 
   Test_Base1 b2;
   EXPECT_EQ(b1.GetRuntimeClass(), b2.GetRuntimeClass());
   EXPECT_EQ(b1.GetRuntimeClass(), GetRuntimeType<Test_Base1>());
 
   EXPECT_EQ(GetTypeName<Test_Base2>(), kTestString_Base2);
-  EXPECT_EQ(GetTypeName<Test_Base2>(), StringView(GetTypeInfo<Test_Base2>().GetName()));
+  EXPECT_EQ(GetTypeName<Test_Base2>(),
+            StringView(GetTypeInfo<Test_Base2>().GetName()));
   EXPECT_NE(Test_Base2::GetTypeInfo().GetHash(), 0);
 
   EXPECT_NE(GetRuntimeType<Test_Base1>(), GetRuntimeType<Test_Base2>());
-  EXPECT_NE(Test_Base1::GetTypeInfo().GetHash(), Test_Base2::GetTypeInfo().GetHash());
+  EXPECT_NE(Test_Base1::GetTypeInfo().GetHash(),
+            Test_Base2::GetTypeInfo().GetHash());
   EXPECT_NE(GetTypeName<Test_Base1>(), GetTypeName<Test_Base2>());
 }
 
@@ -105,16 +118,19 @@ TEST(RuntimeClass, Derived)
 {
   const RuntimeClass& runtime_class = GetRuntimeType<Test_Derived11>();
   EXPECT_EQ(GetTypeName<Test_Derived11>(), kTestString_Derived11);
-  EXPECT_EQ(runtime_class.GetName(), StringView(Test_Derived11::GetTypeInfo().GetName()));
+  EXPECT_EQ(runtime_class.GetName(),
+            StringView(Test_Derived11::GetTypeInfo().GetName()));
   EXPECT_EQ(runtime_class.GetHash(), Test_Derived11::GetTypeInfo().GetHash());
   EXPECT_NE(runtime_class.GetHash(), 0);
 
   Test_Derived11 d1;
   EXPECT_EQ(d1.GetRuntimeClass(), runtime_class);
   EXPECT_EQ(d1.GetRuntimeClass().GetName(), kTestString_Derived11);
-  EXPECT_EQ(d1.GetRuntimeClass().GetHash(), Test_Derived11::GetTypeInfo().GetHash());
+  EXPECT_EQ(d1.GetRuntimeClass().GetHash(),
+            Test_Derived11::GetTypeInfo().GetHash());
 
-  ASSERT_NE(Test_Base1::GetTypeInfo().GetHash(), d1.GetRuntimeClass().GetHash());
+  ASSERT_NE(Test_Base1::GetTypeInfo().GetHash(),
+            d1.GetRuntimeClass().GetHash());
 }
 
 TEST(RuntimeClass, DynamicCast)
