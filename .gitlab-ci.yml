@@ -38,7 +38,7 @@ cppcheck:
   stage: analysis
   image: python:3.11-alpine
   variables:
-    CI_BUILD_CPPCHECK_PRESET: "linux_tests"
+    CI_BUILD_CPPCHECK_PRESET: "linux_debug"
   before_script:
     - apk add --no-cache bash
     - apk add --no-cache cppcheck cmake
