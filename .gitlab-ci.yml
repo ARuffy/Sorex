@@ -74,7 +74,7 @@ test-engine:
     - cmake --version
     - cmake --preset ${CI_BUILD_TEST_PRESET}
     - cmake --build ./build/${CI_BUILD_TEST_PRESET}
-    - ./build/${CI_BUILD_TEST_PRESET}/Engine/Test/${CI_ENGINE_GTEST_EXE} --gtest_output="xml:./gtest-result.xml"
+    - ./build/${CI_BUILD_TEST_PRESET}/Engine/Tests/${CI_ENGINE_GTEST_EXE} --gtest_output="xml:./gtest-result.xml"
   artifacts:
     when: always
     reports:
