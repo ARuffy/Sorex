@@ -1,0 +1,85 @@
+stages:
+  - analysis
+  - test
+
+code-format:
+  stage: analysis
+  image:
+    name: python:3.11-alpine
+    pull_policy: always # available: always, if-not-present, never
+  before_script:
+    - apk add --no-cache bash
+    - apk add --update util-linux
+    - apk add --no-cache clang-extra-tools
+    - apk add git
+    - git fetch --depth=1 origin ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+    - git switch ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+    - git pull origin ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+    - git fetch origin ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - git switch ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - git pull origin ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+    - echo "$(git branch)"
+    - mkdir ./artifacts
+  script:
+    - echo "Getting git changed files ..."
+    - bash ./Extras/Shell/GitChangedFiles.sh ${CI_MERGE_REQUEST_TARGET_BRANCH_NAME} ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} > ./artifacts/changed-files-list.txt
+    - echo "Compare Code Formatting..."
+    - bash ./Extras/Shell/ClangFormat.sh --output-file ./artifacts/lint_fromat.diff --files ./artifacts/changed-files-list.txt
+  artifacts:
+    when: always
+    paths:
+      - ./artifacts/changed-files-list.txt
+      - ./artifacts/lint_fromat.diff
+  only:
+    - merge_requests
+  tags: [saas-linux-small-amd64]
+
+cppcheck:
+  stage: analysis
+  image: python:3.11-alpine
+  before_script:
+    - apk add --no-cache bash
+    - apk add --update util-linux
+    - apk add --no-cache cppcheck
+    - mkdir ./artifacts
+  script:
+    - echo "Cppcheck start analysis ..."
+    - bash ./Extras/Cppcheck/Cppcheck.sh --output-file ./artifacts/cppcheck-result.xml
+    - python3 ./Extras/Cppcheck/Scripts/cppcheck_conv.py --format junit ./artifacts/cppcheck-result.xml > ./artifacts/cppcheck-junit.xml
+  artifacts:
+    when: always
+    paths:
+      - ./artifacts/cppcheck-result.xml
+      - ./artifacts/cppcheck-junit.xml
+    reports:
+      junit: ./artifacts/cppcheck-junit.xml
+  only:
+    - merge_requests
+  tags: [saas-linux-small-amd64]
+
+
+test-engine:
+  stage: test
+  image:
+    name: debian:bookworm
+    pull_policy: always # available: always, if-not-present, never
+  variables:
+    CI_BUILD_TEST_PRESET: "unit_tests"
+    CI_ENGINE_GTEST_EXE: SorexEngineUnitTests
+  before_script:
+    - apt-get update
+    - apt-get -y install clang cmake libgtest-dev
+  script:
+    - mkdir ./build
+    - cmake --version
+    - cmake --preset ${CI_BUILD_TEST_PRESET}
+    - cmake --build ./build
+    - ./build/${CI_BUILD_TEST_PRESET}/Engine/Test/${CI_ENGINE_GTEST_EXE} --gtest_output="xml:./gtest-result.xml"
+  artifacts:
+    when: always
+    reports:
+      junit: ./gtest-result.xml
+  only:
+    - develop
+    - main
+  tags: [saas-linux-small-amd64]

@@ -6,7 +6,7 @@
       "hidden": true,
       "displayName": "Unix Base (Debug)",
       "description": "Debug build preset for Unix based operating systems",
-      "generator": "Ninja",
+      "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
