@@ -6,7 +6,7 @@ code-format:
   stage: analysis
   image:
     name: python:3.11-alpine
-    pull_policy: if-not-present # available: always, if-not-present, never
+    pull_policy: always # available: always, if-not-present, never
   before_script:
     - apk add --no-cache bash
     - apk add --update util-linux
