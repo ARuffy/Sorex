@@ -38,7 +38,9 @@ cppcheck:
   stage: analysis
   image: python:3.11-alpine
   before_script:
-    - apk add --no-cache bash cppcheck
+    - apk add --no-cache bash
+    - apk add --update util-linux
+    - apk add --no-cache cppcheck
     - mkdir ./artifacts
   script:
     - echo "Cppcheck start analysis ..."
