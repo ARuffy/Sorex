@@ -35,7 +35,7 @@
       "generator": "Unix Makefiles",
       "binaryDir": "${sourceDir}/build/${presetName}",
       "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "MinSizeRel",
+        "CMAKE_BUILD_TYPE": "Release",
         "SOREX_BUILD_SANDBOX": "OFF",
         "SOREX_BUILD_TESTS": "ON"
       }

@@ -30,13 +30,12 @@ function(sorex_target_compile_definitions TARGET_NAME)
       "[${TARGET_NAME}] Configuring compile definitions (${CMAKE_SYSTEM_NAME})"
   )
 
-  target_compile_definitions(
-    ${TARGET_NAME}
+  target_compile_definitions(${TARGET_NAME}
     PUBLIC ${TARGET_PLATFORM}=1
            $<$<CONFIG:Debug>:SOREX_DEBUG_MODE=2>
            $<$<CONFIG:Debug>:_DEBUG>
-           $<$<CONFIG:Release>:NDEBUG>
            $<$<CONFIG:Release>:SOREX_DEBUG_MODE=1>
+           $<$<CONFIG:RelMinSize>:NDEBUG>
            $<$<CONFIG:RelMinSize>:SOREX_DEBUG_MODE=0>
   )
 endfunction(sorex_target_compile_definitions)
