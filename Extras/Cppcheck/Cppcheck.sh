@@ -82,4 +82,5 @@ ${CPPCHECK_EXE} -j${USE_THREADS}\
     --inline-suppr \
     --suppressions-list=.cppcheck-supressions \
     --xml \
-    --output-file=${OUTPUT_FILE_NAME}
+    --output-file=${OUTPUT_FILE_NAME} \
+    --error-exitcode=1
