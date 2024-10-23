@@ -41,7 +41,7 @@ cppcheck:
     CI_BUILD_CPPCHECK_PRESET: "linux_debug"
   before_script:
     - apk add --no-cache bash
-    - apk add --no-cache cppcheck cmake
+    - apk add --no-cache cppcheck make cmake
     - cmake --preset ${CI_BUILD_CPPCHECK_PRESET}
     - mkdir ./artifacts
   script:
