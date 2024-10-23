@@ -42,7 +42,7 @@ cppcheck:
   before_script:
     - apk add --no-cache bash
     - apk add --no-cache cppcheck cmake
-    - cmake --preset ${CI_BUILD_TEST_PRESET}
+    - cmake --preset ${CI_BUILD_CPPCHECK_PRESET}
     - mkdir ./artifacts
   script:
     - echo "Cppcheck start analysis ..."
