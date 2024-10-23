@@ -6,7 +6,7 @@ code-format:
   stage: analysis
   image:
     name: python:3.11-alpine
-    pull_policy: always # available: always, if-not-present, never
+    pull_policy: if-not-present # available: always, if-not-present, never
   before_script:
     - apk add --no-cache bash
     - apk add --update util-linux
@@ -37,16 +37,12 @@ code-format:
 cppcheck:
   stage: analysis
   image: python:3.11-alpine
-  variables:
-    CI_BUILD_CPPCHECK_PRESET: "linux_debug"
   before_script:
-    - apk add --no-cache bash
-    - apk add --no-cache cppcheck make cmake
-    - cmake --preset ${CI_BUILD_CPPCHECK_PRESET}
+    - apk add --no-cache bash cppcheck
     - mkdir ./artifacts
   script:
     - echo "Cppcheck start analysis ..."
-    - bash ./Extras/Cppcheck/Cppcheck.sh -j 4 --output-file ./artifacts/cppcheck-result.xml
+    - bash ./Extras/Cppcheck/Cppcheck.sh --output-file ./artifacts/cppcheck-result.xml
     - python3 ./Extras/Cppcheck/Scripts/cppcheck_conv.py --format junit ./artifacts/cppcheck-result.xml > ./artifacts/cppcheck-junit.xml
   artifacts:
     when: always

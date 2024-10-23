@@ -8,7 +8,6 @@ CPPCHECK_DIR=$(pwd)"/build/cppcheck"
 CPPCHECK_PROJ_DIR="${CPPCHECK_DIR}/proj"
 OUTPUT_FILE_NAME="${CPPCHECK_DIR}/cppcheck-result.xml"
 
-USE_THREADS=1
 USE_CLANG=0
 
 get_absolute_path() {
@@ -43,9 +42,6 @@ while [[ $# -gt 0 ]]; do
         exit 1
       fi
       shift 2 ;;
-    -j)
-      USE_THREADS=$2
-      shift 2 ;;
     ?) echo "Script unknown option: '${1}'" >&2
        exit 1 ;;
   esac
@@ -64,6 +60,7 @@ else
     CLANG_FLAG=""
 fi
 
+USE_THREADS=1
 THREADS_NUM=$(cat /proc/cpuinfo | grep processor | wc -l)
 if [[ $USE_THREADS -gt $THREADS_NUM ]]; then
     USE_THREADS=$THREADS_NUM
@@ -74,7 +71,6 @@ ${CPPCHECK_EXE} -j${USE_THREADS}\
       ${CLANG_FLAG}  \
     --platform=unix64 \
     --std=c++20 \
-    --project=./build/compile_commands.json \
     --cppcheck-build-dir=${CPPCHECK_PROJ_DIR} \
     --enable=style,performance,portability \
     --inconclusive \
@@ -83,4 +79,9 @@ ${CPPCHECK_EXE} -j${USE_THREADS}\
     --suppressions-list=.cppcheck-supressions \
     --xml \
     --output-file=${OUTPUT_FILE_NAME} \
-    --error-exitcode=1
+    --error-exitcode=1 \
+    -DSOREX_DEBUG_MODE=1 \
+    -DTARGET_PLATFORM_LINUX=1 \
+    -I./Engine/Include/ \
+    -I./Precompiled/ \
+    ./Engine/Source
