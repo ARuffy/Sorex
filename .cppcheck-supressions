@@ -1,0 +1,6 @@
+# common
+missingInclude
+funcArgNamesDifferent
+
+# file specific
+useStlAlgorithm:Engine/Include/Sorex/RuntimeClass.h
