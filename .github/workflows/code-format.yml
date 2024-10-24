@@ -1,6 +1,6 @@
 name: Code Format
 
-on: [push, pull_request]
+on: [pull_request]
 
 jobs:
   code-format:
@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Set up bash and clang-tools
         run: |
-          sudo apt-get update && sudo apt-get -y install util-linux  clang-format clang-extra-tools
+          sudo apt-get update && sudo apt-get -y install util-linux clang-format
 
       - name: Check out the repository
         uses: actions/checkout@v4
