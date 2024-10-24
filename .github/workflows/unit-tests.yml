@@ -2,7 +2,7 @@ name: Engine Unit Tests
 
 on:
   pull_request:
-    branches: ["master", "develop", "release/**", "feature/**"]
+    branches: ["master", "develop", "release/**"]
   push:
     branches: ["master", "develop"]
 
