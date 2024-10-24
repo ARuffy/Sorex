@@ -41,8 +41,7 @@ namespace Sorex::Platform
    *
    * @return 0 - to continue with assert(expr) to terminate application;
    */
-  int OnAssertionFailed(const char* message, 
-                        const char* file, int line);
+  int OnAssertionFailed(const char* message, const char* file, int line);
 
   /**
    * @brief OnCheckFailed - called when check/verify expression failed.
