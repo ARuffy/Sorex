@@ -38,6 +38,7 @@ jobs:
         run: bash ./Extras/Shell/ClangFormat.sh --output-file ./artifacts/lint_format.diff --files ./artifacts/changed-files-list.txt
 
       - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: format-artifacts
